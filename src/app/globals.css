@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --color-canvas: #fcfbf9;
+    --color-surface: #ffffff;
+    --color-surface-hover: #f5f3ee;
+    --color-panel: #ffffff;
+    --color-panel-subtle: #f8f6f0;
+    --color-border: #e5e0d8;
+    --color-border-subtle: #eeeae2;
+    --color-border-focus: #b48608;
+
+    --color-text-primary: #181816;
+    --color-text-secondary: #43403b;
+    --color-text-muted: #767269;
+
+    /* Atelier Masculine Editorial Brand: Antique Bronze & Champagne Gold */
+    --color-brand: #b48608;
+    --color-brand-hover: #996d04;
+    --color-brand-subtle: #fdf8e6;
+    --color-brand-accent: #936a28;
+
+    /* Operational & Booking Status Indicators */
+    --color-status-green: #059669;
+    --color-status-green-bg: #ecfdf5;
+    --color-status-green-border: #a7f3d0;
+
+    --color-status-blue: #1e3a8a;
+    --color-status-blue-bg: #eff6ff;
+    --color-status-blue-border: #bfdbfe;
+
+    --color-status-amber: #b45309;
+    --color-status-amber-bg: #fffbeb;
+    --color-status-amber-border: #fde68a;
+
+    --color-status-red: #b91c1c;
+    --color-status-red-bg: #fef2f2;
+    --color-status-red-border: #fecaca;
+  }
+
+  .dark {
+    --color-canvas: #0c0d10;
+    --color-surface: #13151a;
+    --color-surface-hover: #191c23;
+    --color-panel: #13151a;
+    --color-panel-subtle: #0f1014;
+    --color-border: #232732;
+    --color-border-subtle: #1c1f28;
+    --color-border-focus: #d4af37;
+
+    --color-text-primary: #f5f4f0;
+    --color-text-secondary: #b6b3a9;
+    --color-text-muted: #78756d;
+
+    /* Dark Mode Atelier Brand: Rich Metallic Gold */
+    --color-brand: #d4af37;
+    --color-brand-hover: #e5be46;
+    --color-brand-subtle: rgba(212, 175, 55, 0.12);
+    --color-brand-accent: #e2c058;
+
+    /* Dark Operational Status Indicators */
+    --color-status-green: #10b981;
+    --color-status-green-bg: rgba(16, 185, 129, 0.12);
+    --color-status-green-border: rgba(16, 185, 129, 0.28);
+
+    --color-status-blue: #3b82f6;
+    --color-status-blue-bg: rgba(59, 130, 246, 0.12);
+    --color-status-blue-border: rgba(59, 130, 246, 0.28);
+
+    --color-status-amber: #f59e0b;
+    --color-status-amber-bg: rgba(245, 158, 11, 0.12);
+    --color-status-amber-border: rgba(245, 158, 11, 0.28);
+
+    --color-status-red: #ef4444;
+    --color-status-red-bg: rgba(239, 68, 68, 0.12);
+    --color-status-red-border: rgba(239, 68, 68, 0.28);
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-text-primary);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .font-serif-luxury {
+    font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+    letter-spacing: 0.04em;
+  }
+
+  .font-editorial {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .font-mono-tight {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Atmospheric subtle grid background */
+.bg-atelier-grid {
+  background-image: 
+    linear-gradient(to right, rgba(140, 120, 80, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(140, 120, 80, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.dark .bg-atelier-grid {
+  background-image: 
+    linear-gradient(to right, rgba(212, 175, 55, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212, 175, 55, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
