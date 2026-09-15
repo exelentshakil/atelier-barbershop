@@ -49,6 +49,14 @@ export function LookbookSlider({ onSelectCutForBooking }: LookbookSliderProps) {
     }
   };
 
+  const handleSelectForSlider = (item: LookbookItem) => {
+    setActiveItem(item);
+    if (containerRef.current) {
+      const topOffset = containerRef.current.getBoundingClientRect().top + window.pageYOffset - 110;
+      window.scrollTo({ top: topOffset, behavior: "smooth" });
+    }
+  };
+
   const categories = ["All", "Fades & Tapers", "Scissor Craft", "Beard & Shave", "Classic Heritage"];
 
   const filteredItems =
@@ -110,7 +118,7 @@ export function LookbookSlider({ onSelectCutForBooking }: LookbookSliderProps) {
               >
                 <div className="absolute top-4 right-4 px-3 py-1.5 rounded-lg bg-black/80 backdrop-blur-md text-[#d4af37] font-mono text-xs font-bold uppercase tracking-wider border border-[#d4af37]/40 shadow-lg flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse" />
-                  <span>After • Atelier Precision</span>
+                  <span>{activeItem.afterLabel || "After • Atelier Precision"}</span>
                 </div>
               </div>
 
@@ -123,7 +131,7 @@ export function LookbookSlider({ onSelectCutForBooking }: LookbookSliderProps) {
                 }}
               >
                 <div className="absolute top-4 left-4 px-3 py-1.5 rounded-lg bg-black/80 backdrop-blur-md text-white/90 font-mono text-xs font-bold uppercase tracking-wider border border-white/20 shadow-lg">
-                  Before • Overgrown Silhouette
+                  {activeItem.beforeLabel || "Before • Overgrown Silhouette"}
                 </div>
               </div>
 
@@ -276,13 +284,22 @@ export function LookbookSlider({ onSelectCutForBooking }: LookbookSliderProps) {
               className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden hover:border-[var(--color-brand)] hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                {/* Photo with hover zoom */}
-                <div className="relative w-full aspect-[4/3] overflow-hidden bg-black">
+                {/* Photo with hover zoom and click-to-compare */}
+                <div
+                  onClick={() => handleSelectForSlider(item)}
+                  className="relative w-full aspect-[4/3] overflow-hidden bg-black cursor-pointer"
+                  title="Click to load into Interactive Comparison Slider"
+                >
                   <div
                     className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
                     style={{ backgroundImage: `url(${item.afterImg})` }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+
+                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-black/85 backdrop-blur-md text-white font-mono text-[10px] font-bold border border-white/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 shadow-lg">
+                    <MoveHorizontal className="h-3 w-3 text-[#d4af37]" />
+                    <span>Inspect Split Slider</span>
+                  </div>
 
                   <div className="absolute top-3 right-3 px-2.5 py-1 rounded bg-black/75 backdrop-blur-md text-[#d4af37] font-mono text-[10px] uppercase font-bold border border-[#d4af37]/30">
                     {item.category}
@@ -321,15 +338,23 @@ export function LookbookSlider({ onSelectCutForBooking }: LookbookSliderProps) {
                 </div>
               </div>
 
-              {/* Action */}
-              <div className="p-5 pt-0">
+              {/* Action: Compare in Slider + Book Look */}
+              <div className="p-5 pt-0 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSelectForSlider(item)}
+                  className="text-xs font-mono font-bold py-2 px-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-brand)] hover:border-[var(--color-brand)] hover:bg-[var(--color-panel-subtle)] transition-all flex items-center justify-center gap-1 shadow-xs cursor-pointer"
+                >
+                  <MoveHorizontal className="h-3.5 w-3.5 text-[var(--color-brand)]" />
+                  <span className="truncate">Compare Slider</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => onSelectCutForBooking(item.serviceId, item.barberId)}
-                  className="w-full text-xs font-mono font-bold py-2.5 px-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-panel-subtle)] text-[var(--color-text-primary)] hover:bg-[var(--color-brand)] hover:text-white hover:border-[var(--color-brand)] transition-all flex items-center justify-between shadow-xs cursor-pointer group/btn"
+                  className="text-xs font-mono font-bold py-2 px-2.5 rounded-xl border border-[var(--color-brand)] bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)] transition-all flex items-center justify-center gap-1 shadow-xs cursor-pointer group/btn"
                 >
-                  <span>Book This Look</span>
-                  <ArrowRight className="h-3.5 w-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                  <span>Book Look</span>
+                  <ArrowRight className="h-3.5 w-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                 </button>
               </div>
             </div>
