@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   INITIAL_SERVICES,
   MASTER_BARBERS,
   INITIAL_STUDIO_INFO,
+  LOOKBOOK_ITEMS,
   ServiceItem,
   BarberProfile,
   StudioInfo,
+  LookbookItem,
 } from "@/lib/data";
 import { Header } from "@/components/Header";
 import { ReviewerTour } from "@/components/ReviewerTour";
@@ -19,10 +21,18 @@ import { OwnerCmsStudio } from "@/components/OwnerCmsStudio";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { StudioLocation } from "@/components/StudioLocation";
 import { SeoSchemaInspector } from "@/components/SeoSchemaInspector";
+import { AtelierCraftGallery } from "@/components/AtelierCraftGallery";
 import { Footer } from "@/components/Footer";
 import { StyleConsultantModal } from "@/components/StyleConsultantModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Calendar,
   Sparkles,
@@ -32,8 +42,15 @@ import {
   MapPin,
   Search,
   Users,
-  ShieldCheck,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Maximize2,
   ChevronRight,
+  ShieldCheck,
+  Clock,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function Home() {
@@ -53,6 +70,12 @@ export default function Home() {
   // AI Style Consultant Modal State
   const [isConsultantOpen, setIsConsultantOpen] = useState<boolean>(false);
 
+  // Video Experience States
+  const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(true);
+  const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
+  const [isReelModalOpen, setIsReelModalOpen] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   // Load from localStorage on client mount
   useEffect(() => {
     setIsClient(true);
@@ -70,21 +93,38 @@ export default function Home() {
     }
   }, []);
 
+  const toggleVideoPlayback = () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause();
+        setIsVideoPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsVideoPlaying(true);
+      }
+    }
+  };
+
+  const toggleVideoMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isVideoMuted;
+      setIsVideoMuted(!isVideoMuted);
+    }
+  };
+
   // Handlers for cross-component interactions
   const handleOpenBooking = (serviceId?: string, barberId?: string) => {
     if (serviceId) setPrefilledServiceId(serviceId);
     if (barberId) setPrefilledBarberId(barberId);
     setActiveTab("booking");
-    window.scrollTo({ top: 350, behavior: "smooth" });
+    window.scrollTo({ top: 480, behavior: "smooth" });
   };
 
   const handleConsultantBooking = (serviceName: string, barberName: string) => {
-    // Find matching service
     const matchedService = services.find((s) =>
       s.name.toLowerCase().includes(serviceName.toLowerCase()) ||
       serviceName.toLowerCase().includes(s.name.toLowerCase())
     );
-    // Find matching barber
     const matchedBarber = barbers.find((b) =>
       b.name.toLowerCase().includes(barberName.toLowerCase()) ||
       barberName.toLowerCase().includes(b.name.split(" ")[0].toLowerCase())
@@ -94,7 +134,7 @@ export default function Home() {
     setPrefilledBarberId(matchedBarber?.id || "julian");
     setIsConsultantOpen(false);
     setActiveTab("booking");
-    window.scrollTo({ top: 350, behavior: "smooth" });
+    window.scrollTo({ top: 480, behavior: "smooth" });
   };
 
   return (
@@ -112,32 +152,86 @@ export default function Home() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Luxury Hero Banner */}
-        <section className="relative rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-10 lg:p-12 overflow-hidden shadow-sm">
-          {/* Subtle gold grid ambient glow */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-brand)]/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-          <div className="absolute bottom-0 left-0 w-72 h-72 bg-[var(--color-brand-accent)]/5 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
+        {/* ULTRA-LUXURY CINEMATIC HERO SECTION WITH AMBIENT VIDEO */}
+        <section className="relative rounded-3xl border border-[var(--color-border)] bg-[#0c0d10] text-white overflow-hidden shadow-2xl min-h-[520px] flex flex-col justify-between">
+          {/* Ambient Background Video */}
+          <div className="absolute inset-0 overflow-hidden">
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="https://images.pexels.com/videos/7697179/back-barber-barber-shop-barbering-7697179.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=630&w=1200"
+              className="w-full h-full object-cover object-center opacity-45 scale-105 transition-all duration-1000"
+            >
+              <source
+                src="https://videos.pexels.com/video-files/7697179/7697179-hd_1920_1080_30fps.mp4"
+                type="video/mp4"
+              />
+            </video>
 
-          <div className="relative z-10 max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-brand-subtle)] border border-[var(--color-brand)]/30 text-xs font-mono font-semibold text-[var(--color-brand)]">
-              <span className="w-2 h-2 rounded-full bg-[var(--color-brand)] animate-pulse" />
+            {/* Smoked obsidian & antique gold luxury gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0d10] via-[#0c0d10]/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d10] via-transparent to-black/40" />
+          </div>
+
+          {/* Top Video & Status Controls */}
+          <div className="relative z-10 p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-[#b48608]/40 text-xs font-mono font-bold text-[#d4af37]">
+              <span className="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse" />
               <span>AUBURN, AL • BESPOKE EDITORIAL GROOMING</span>
             </div>
 
+            {/* Video Controls Pill */}
+            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-3 py-1 text-xs font-mono text-white/80">
+              <button
+                onClick={toggleVideoPlayback}
+                className="hover:text-white transition-colors flex items-center gap-1"
+                title={isVideoPlaying ? "Pause ambient video" : "Play ambient video"}
+              >
+                {isVideoPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 fill-current" />}
+                <span>{isVideoPlaying ? "Ambient" : "Paused"}</span>
+              </button>
+              <span className="text-white/30">|</span>
+              <button
+                onClick={toggleVideoMute}
+                className="hover:text-white transition-colors"
+                title={isVideoMuted ? "Unmute audio" : "Mute audio"}
+              >
+                {isVideoMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+              </button>
+              <span className="text-white/30">|</span>
+              <button
+                onClick={() => setIsReelModalOpen(true)}
+                className="hover:text-[#d4af37] transition-colors flex items-center gap-1 text-[#d4af37]"
+                title="Watch Studio Craft Reel"
+              >
+                <Maximize2 className="h-3 w-3" />
+                <span>Reel</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Center Brand Headline */}
+          <div className="relative z-10 px-6 sm:px-10 lg:px-12 py-4 max-w-3xl space-y-5">
             <div className="space-y-3">
-              <h1 className="font-serif-luxury text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-text-primary)] leading-[1.15]">
+              <span className="text-xs sm:text-sm font-mono tracking-widest text-[#d4af37] font-bold uppercase block">
+                Heritage Scissorcraft • Modern Architecture
+              </span>
+              <h1 className="font-serif-luxury text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.12]">
                 Precision Grooming for the Modern Gentleman.
               </h1>
-              <p className="text-sm sm:text-base text-[var(--color-text-secondary)] leading-relaxed font-sans max-w-2xl">
-                Auburn's premier editorial barbershop. Blending heritage Savile Row scissorcraft with contemporary skin tapers, hot lather rituals, and tailored beard architecture.
+              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-sans max-w-2xl">
+                Auburn's premier bespoke barbershop atelier. Unhurried chair sessions, hot lather straight razor rituals, and custom haircut geometry designed for your bone structure.
               </p>
             </div>
 
-            {/* Hero Quick Action Buttons */}
+            {/* Hero CTAs */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <Button
                 onClick={() => handleOpenBooking()}
-                className="bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white text-xs font-bold uppercase tracking-wider font-mono py-2.5 px-5 shadow-sm"
+                className="bg-[#b48608] hover:bg-[#966f07] text-white text-xs font-bold uppercase tracking-wider font-mono py-3 px-6 shadow-lg shadow-[#b48608]/20 border border-[#d4af37]/40"
               >
                 <Calendar className="h-4 w-4 mr-1.5" />
                 Reserve Chair Now
@@ -146,20 +240,51 @@ export default function Home() {
               <Button
                 onClick={() => setIsConsultantOpen(true)}
                 variant="outline"
-                className="border-[var(--color-brand)]/50 hover:bg-[var(--color-brand-subtle)] text-[var(--color-brand)] text-xs font-bold uppercase tracking-wider font-mono py-2.5 px-5"
+                className="border-white/30 bg-white/5 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-wider font-mono py-3 px-6 backdrop-blur-md"
               >
-                <Sparkles className="h-4 w-4 mr-1.5 text-[var(--color-brand)]" />
+                <Sparkles className="h-4 w-4 mr-1.5 text-[#d4af37]" />
                 AI Style Consultant
               </Button>
 
-              <Button
-                onClick={() => setActiveTab("lookbook")}
-                variant="ghost"
-                className="text-xs font-mono font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              <button
+                onClick={() => setIsReelModalOpen(true)}
+                className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-gray-300 hover:text-white px-3 py-2 transition-colors"
               >
-                <span>View Before/After Slider</span>
-                <ChevronRight className="h-3.5 w-3.5 ml-1" />
-              </Button>
+                <div className="w-6 h-6 rounded-full bg-[#d4af37]/20 border border-[#d4af37] flex items-center justify-center text-[#d4af37]">
+                  <Play className="h-3 w-3 fill-current ml-0.5" />
+                </div>
+                <span>Watch Studio Craft Reel</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom Live Chair Telemetry Ticker */}
+          <div className="relative z-10 border-t border-white/10 bg-black/50 backdrop-blur-md px-6 sm:px-10 py-3.5 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 text-[#d4af37]">
+                <Clock className="h-3.5 w-3.5" />
+                <span className="font-bold">LIVE CHAIR STATUS:</span>
+              </div>
+              {barbers.map((b) => (
+                <div key={b.id} className="hidden sm:flex items-center gap-1.5 text-gray-300">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      b.chairStatus === "available"
+                        ? "bg-emerald-400 animate-pulse"
+                        : b.chairStatus === "in_chair"
+                        ? "bg-amber-400"
+                        : "bg-gray-500"
+                    }`}
+                  />
+                  <span className="font-semibold">{b.name.split(" ")[0]}:</span>
+                  <span className="text-gray-400 capitalize">{b.chairStatus.replace("_", " ")}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3 text-gray-300">
+              <span className="text-[#d4af37] font-bold">4.9 ★</span>
+              <span className="text-gray-400">482 Verified Auburn Reviews</span>
             </div>
           </div>
         </section>
@@ -180,6 +305,18 @@ export default function Home() {
             >
               <Scissors className="h-3.5 w-3.5" />
               <span>Haircut Lookbook & Before/After</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("craft")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
+                activeTab === "craft"
+                  ? "bg-[var(--color-brand)] text-white shadow-sm"
+                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Atelier Craft Gallery</span>
             </button>
 
             <button
@@ -266,6 +403,12 @@ export default function Home() {
             />
           )}
 
+          {activeTab === "craft" && (
+            <AtelierCraftGallery
+              onSelectBooking={(serviceId) => handleOpenBooking(serviceId)}
+            />
+          )}
+
           {activeTab === "booking" && (
             <BookingEngine
               initialServiceId={prefilledServiceId}
@@ -308,6 +451,44 @@ export default function Home() {
           )}
         </div>
       </main>
+
+      {/* Full-Screen Studio Craft Reel Modal */}
+      <Dialog open={isReelModalOpen} onOpenChange={setIsReelModalOpen}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black border border-white/20 text-white">
+          <div className="relative aspect-video w-full bg-black">
+            <video
+              autoPlay
+              controls
+              playsInline
+              className="w-full h-full object-contain"
+            >
+              <source
+                src="https://videos.pexels.com/video-files/7697179/7697179-hd_1920_1080_30fps.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
+          <div className="p-5 bg-[#0c0d10] border-t border-white/10 flex items-center justify-between">
+            <div>
+              <span className="text-xs font-mono text-[#d4af37] uppercase font-bold tracking-wider block">
+                Atelier Auburn Studio Reel
+              </span>
+              <h3 className="font-serif-luxury text-lg font-bold text-white">
+                The Master Barbering Ritual • Savile Row Shears & Straight Razor
+              </h3>
+            </div>
+            <Button
+              onClick={() => {
+                setIsReelModalOpen(false);
+                handleOpenBooking();
+              }}
+              className="bg-[#b48608] hover:bg-[#966f07] text-white text-xs font-bold uppercase font-mono px-4 py-2"
+            >
+              Reserve Chair
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* AI Style Consultant Dialog */}
       <StyleConsultantModal
