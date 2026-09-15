@@ -223,6 +223,19 @@ export const LOOKBOOK_ITEMS: LookbookItem[] = [
     pomadeRecommended: "Atelier Soothing Post-Shave Botanical Tonic",
     hairType: "Sensitive Skin • Dense Growth",
   },
+  {
+    id: "look-6",
+    title: "Classic Low Taper & Textured Side Part",
+    category: "Classic Heritage",
+    barberName: "Julian Vance",
+    barberId: "julian",
+    serviceId: "sig-cut",
+    beforeImg: "https://images.pexels.com/photos/897262/pexels-photo-897262.jpeg?auto=compress&cs=tinysrgb&w=800",
+    afterImg: "https://images.pexels.com/photos/2805050/pexels-photo-2805050.jpeg?auto=compress&cs=tinysrgb&w=800",
+    stylingNotes: "Scissor-over-comb gradual taper around the neckline and ears, paired with a razor-etched soft part line and natural finger-combed flow.",
+    pomadeRecommended: "Atelier Classic High-Hold Low-Shine Water Pomade",
+    hairType: "Medium to Thick • Natural Wave",
+  },
 ];
 
 export const GOOGLE_REVIEWS: GoogleReview[] = [

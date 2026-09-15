@@ -9,7 +9,6 @@ import {
   ServiceItem,
   BarberProfile,
   StudioInfo,
-  LookbookItem,
 } from "@/lib/data";
 import { Header } from "@/components/Header";
 import { ReviewerTour } from "@/components/ReviewerTour";
@@ -29,9 +28,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Calendar,
@@ -51,6 +47,7 @@ import {
   ShieldCheck,
   Clock,
   CheckCircle2,
+  ArrowDown,
 } from "lucide-react";
 
 export default function Home() {
@@ -60,7 +57,7 @@ export default function Home() {
   const [studioInfo, setStudioInfo] = useState<StudioInfo>(INITIAL_STUDIO_INFO);
   const [isClient, setIsClient] = useState<boolean>(false);
 
-  // Active View Tab
+  // Active Section Tracker (Synchronized with Scroll & Header Navigation)
   const [activeTab, setActiveTab] = useState<string>("lookbook");
 
   // Booking Engine Prefills
@@ -93,6 +90,43 @@ export default function Home() {
     }
   }, []);
 
+  // Smooth Scroll to Any Section with Sticky Header Compensation
+  const scrollToSection = (sectionId: string) => {
+    setActiveTab(sectionId);
+    if (sectionId === "hero") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const headerOffset = 85;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Active Section Spy on Window Scroll
+  useEffect(() => {
+    const sectionIds = ["hero", "lookbook", "craft", "booking", "barbers", "reviews", "location", "cms", "seo"];
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 120;
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sectionIds[i]);
+        if (el && el.offsetTop <= scrollPosition) {
+          setActiveTab(sectionIds[i]);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const toggleVideoPlayback = () => {
     if (videoRef.current) {
       if (isVideoPlaying) {
@@ -116,8 +150,7 @@ export default function Home() {
   const handleOpenBooking = (serviceId?: string, barberId?: string) => {
     if (serviceId) setPrefilledServiceId(serviceId);
     if (barberId) setPrefilledBarberId(barberId);
-    setActiveTab("booking");
-    window.scrollTo({ top: 480, behavior: "smooth" });
+    scrollToSection("booking");
   };
 
   const handleConsultantBooking = (serviceName: string, barberName: string) => {
@@ -133,28 +166,30 @@ export default function Home() {
     setPrefilledServiceId(matchedService?.id || "sig-cut");
     setPrefilledBarberId(matchedBarber?.id || "julian");
     setIsConsultantOpen(false);
-    setActiveTab("booking");
-    window.scrollTo({ top: 480, behavior: "smooth" });
+    scrollToSection("booking");
   };
 
   return (
     <div className="min-h-screen bg-[var(--color-canvas)] text-[var(--color-text-primary)] flex flex-col selection:bg-[var(--color-brand)] selection:text-white transition-colors duration-200">
-      {/* Top Header */}
+      {/* Top Header with Smooth Sliding Navigation */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        onNavigate={scrollToSection}
         onOpenConsultant={() => setIsConsultantOpen(true)}
         onOpenBooking={() => handleOpenBooking()}
       />
 
       {/* Reviewer Quick Tour & Executive Evaluation Bar */}
-      <ReviewerTour onSelectPath={(tabId) => setActiveTab(tabId)} />
+      <ReviewerTour onSelectPath={(tabId) => scrollToSection(tabId)} />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* ULTRA-LUXURY CINEMATIC HERO SECTION WITH AMBIENT VIDEO */}
-        <section className="relative rounded-3xl border border-[var(--color-border)] bg-[#0c0d10] text-white overflow-hidden shadow-2xl min-h-[520px] flex flex-col justify-between">
-          {/* Ambient Background Video */}
+      {/* Main Continuous Editorial Canvas */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+        {/* SECTION 1: ULTRA-LUXURY CINEMATIC HERO SECTION WITH AMBIENT VIDEO */}
+        <section
+          id="hero"
+          className="relative rounded-3xl border border-[var(--color-border)] bg-[#0c0d10] text-white overflow-hidden shadow-2xl min-h-[540px] flex flex-col justify-between scroll-mt-24"
+        >
+          {/* Ambient Background Video Loop */}
           <div className="absolute inset-0 overflow-hidden">
             <video
               ref={videoRef}
@@ -171,23 +206,23 @@ export default function Home() {
               />
             </video>
 
-            {/* Smoked obsidian & antique gold luxury gradient overlays */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0d10] via-[#0c0d10]/80 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d10] via-transparent to-black/40" />
+            {/* Smoked obsidian & antique bronze luxury gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0d10] via-[#0c0d10]/85 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d10] via-transparent to-black/50" />
           </div>
 
           {/* Top Video & Status Controls */}
           <div className="relative z-10 p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-[#b48608]/40 text-xs font-mono font-bold text-[#d4af37]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-[#b48608]/50 text-xs font-mono font-bold text-[#d4af37] shadow-lg">
               <span className="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse" />
               <span>AUBURN, AL • BESPOKE EDITORIAL GROOMING</span>
             </div>
 
             {/* Video Controls Pill */}
-            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-3 py-1 text-xs font-mono text-white/80">
+            <div className="flex items-center gap-2 bg-black/70 backdrop-blur-md border border-white/15 rounded-full px-3.5 py-1 text-xs font-mono text-white/90 shadow-lg">
               <button
                 onClick={toggleVideoPlayback}
-                className="hover:text-white transition-colors flex items-center gap-1"
+                className="hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 title={isVideoPlaying ? "Pause ambient video" : "Play ambient video"}
               >
                 {isVideoPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 fill-current" />}
@@ -196,7 +231,7 @@ export default function Home() {
               <span className="text-white/30">|</span>
               <button
                 onClick={toggleVideoMute}
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors cursor-pointer"
                 title={isVideoMuted ? "Unmute audio" : "Mute audio"}
               >
                 {isVideoMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
@@ -204,7 +239,7 @@ export default function Home() {
               <span className="text-white/30">|</span>
               <button
                 onClick={() => setIsReelModalOpen(true)}
-                className="hover:text-[#d4af37] transition-colors flex items-center gap-1 text-[#d4af37]"
+                className="hover:text-[#d4af37] transition-colors flex items-center gap-1 text-[#d4af37] font-bold cursor-pointer"
                 title="Watch Studio Craft Reel"
               >
                 <Maximize2 className="h-3 w-3" />
@@ -214,7 +249,7 @@ export default function Home() {
           </div>
 
           {/* Center Brand Headline */}
-          <div className="relative z-10 px-6 sm:px-10 lg:px-12 py-4 max-w-3xl space-y-5">
+          <div className="relative z-10 px-6 sm:px-10 lg:px-12 py-6 max-w-3xl space-y-5">
             <div className="space-y-3">
               <span className="text-xs sm:text-sm font-mono tracking-widest text-[#d4af37] font-bold uppercase block">
                 Heritage Scissorcraft • Modern Architecture
@@ -227,28 +262,30 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Hero CTAs */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            {/* Hero CTAs with Flawless Contrast on Hover */}
+            <div className="pt-2 flex flex-wrap items-center gap-3.5">
               <Button
-                onClick={() => handleOpenBooking()}
-                className="bg-[#b48608] hover:bg-[#966f07] text-white text-xs font-bold uppercase tracking-wider font-mono py-3 px-6 shadow-lg shadow-[#b48608]/20 border border-[#d4af37]/40"
+                onClick={() => scrollToSection("booking")}
+                className="bg-[#b48608] hover:bg-[#966f07] text-white text-xs font-bold uppercase tracking-wider font-mono py-3.5 px-6 shadow-xl shadow-[#b48608]/25 border border-[#d4af37]/40 cursor-pointer"
               >
                 <Calendar className="h-4 w-4 mr-1.5" />
-                Reserve Chair Now
+                <span>Reserve Chair Now</span>
               </Button>
 
-              <Button
+              {/* AI Style Consultant Trigger with Custom High-Contrast Gold Styling */}
+              <button
+                type="button"
                 onClick={() => setIsConsultantOpen(true)}
-                variant="outline"
-                className="border-white/30 bg-white/5 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-wider font-mono py-3 px-6 backdrop-blur-md"
+                className="inline-flex items-center justify-center gap-2 rounded-lg text-xs font-bold uppercase tracking-wider font-mono py-3.5 px-6 border-2 border-[#d4af37] bg-black/60 text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0c0d10] hover:border-[#d4af37] transition-all duration-200 shadow-xl shadow-black/40 backdrop-blur-md cursor-pointer group"
               >
-                <Sparkles className="h-4 w-4 mr-1.5 text-[#d4af37]" />
-                AI Style Consultant
-              </Button>
+                <Sparkles className="h-4 w-4 text-[#d4af37] group-hover:text-[#0c0d10] transition-colors" />
+                <span>AI Style Consultant</span>
+              </button>
 
               <button
+                type="button"
                 onClick={() => setIsReelModalOpen(true)}
-                className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-gray-300 hover:text-white px-3 py-2 transition-colors"
+                className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-gray-300 hover:text-white px-3 py-2 transition-colors cursor-pointer"
               >
                 <div className="w-6 h-6 rounded-full bg-[#d4af37]/20 border border-[#d4af37] flex items-center justify-center text-[#d4af37]">
                   <Play className="h-3 w-3 fill-current ml-0.5" />
@@ -259,7 +296,7 @@ export default function Home() {
           </div>
 
           {/* Bottom Live Chair Telemetry Ticker */}
-          <div className="relative z-10 border-t border-white/10 bg-black/50 backdrop-blur-md px-6 sm:px-10 py-3.5 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+          <div className="relative z-10 border-t border-white/10 bg-black/60 backdrop-blur-md px-6 sm:px-10 py-3.5 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 text-[#d4af37]">
                 <Clock className="h-3.5 w-3.5" />
@@ -289,167 +326,188 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Bento Stats Grid */}
-        <BentoStats />
+        {/* SECTION 2: BENTO HERITAGE STATS GRID */}
+        <section id="metrics" className="scroll-mt-24">
+          <BentoStats />
+        </section>
 
-        {/* Interactive Navigation Tabs for Direct Client Testing */}
-        <div className="border-b border-[var(--color-border)] pb-2 overflow-x-auto">
-          <div className="flex items-center gap-2 min-w-max">
-            <button
-              onClick={() => setActiveTab("lookbook")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "lookbook"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <Scissors className="h-3.5 w-3.5" />
-              <span>Haircut Lookbook & Before/After</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("craft")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "craft"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Atelier Craft Gallery</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("booking")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "booking"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <Calendar className="h-3.5 w-3.5" />
-              <span>4-Step Booking Flow</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("barbers")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "barbers"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <Users className="h-3.5 w-3.5" />
-              <span>Master Barbers</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("cms")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "cms"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <Sliders className="h-3.5 w-3.5" />
-              <span>Owner No-Code Studio</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("reviews")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "reviews"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <Star className="h-3.5 w-3.5" />
-              <span>Google Reviews (4.9★)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("location")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "location"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <MapPin className="h-3.5 w-3.5" />
-              <span>Location, Hours & Maps</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("seo")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                activeTab === "seo"
-                  ? "bg-[var(--color-brand)] text-white shadow-sm"
-                  : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)]"
-              }`}
-            >
-              <Search className="h-3.5 w-3.5" />
-              <span>Local SEO & Schema</span>
-            </button>
+        {/* LUXURY EDITORIAL QUICK-JUMP ANCHOR BAR */}
+        <div className="sticky top-[69px] z-40 py-2.5 px-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-md shadow-md overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-1.5 min-w-max">
+            <span className="text-[11px] font-mono uppercase font-bold text-[var(--color-brand)] px-2.5 hidden sm:inline">
+              Sections:
+            </span>
+            {[
+              { id: "lookbook", label: "Lookbook & Slider", icon: Scissors },
+              { id: "craft", label: "Craft Gallery", icon: Sparkles },
+              { id: "booking", label: "4-Step Booking", icon: Calendar },
+              { id: "barbers", label: "Barber Guild", icon: Users },
+              { id: "reviews", label: "Google Reviews", icon: Star },
+              { id: "location", label: "Location & Hours", icon: MapPin },
+              { id: "cms", label: "Owner CMS Studio", icon: Sliders },
+              { id: "seo", label: "Local SEO & Schema", icon: Search },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => scrollToSection(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-[var(--color-brand)] text-white shadow-sm"
+                      : "bg-[var(--color-panel-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+                  }`}
+                >
+                  <Icon className={`h-3 w-3 ${isActive ? "text-white" : "text-[var(--color-brand)]"}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Dynamic Interactive Active Module */}
-        <div className="transition-all duration-300">
-          {activeTab === "lookbook" && (
-            <LookbookSlider
-              onSelectCutForBooking={(serviceId, barberId) =>
-                handleOpenBooking(serviceId, barberId)
-              }
-            />
-          )}
+        {/* SECTION 3: TRANSFORMATIONS LOOKBOOK & BEFORE/AFTER (6 BALANCED CARDS) */}
+        <section id="lookbook" className="scroll-mt-24 space-y-4">
+          <LookbookSlider
+            onSelectCutForBooking={(serviceId, barberId) =>
+              handleOpenBooking(serviceId, barberId)
+            }
+          />
+        </section>
 
-          {activeTab === "craft" && (
-            <AtelierCraftGallery
-              onSelectBooking={(serviceId) => handleOpenBooking(serviceId)}
-            />
-          )}
-
-          {activeTab === "booking" && (
-            <BookingEngine
-              initialServiceId={prefilledServiceId}
-              initialBarberId={prefilledBarberId}
-              services={services}
-            />
-          )}
-
-          {activeTab === "barbers" && (
-            <BarbersSection
-              barbers={barbers}
-              onSelectBarberForBooking={(barberId) =>
-                handleOpenBooking(undefined, barberId)
-              }
-            />
-          )}
-
-          {activeTab === "cms" && (
-            <OwnerCmsStudio
-              services={services}
-              setServices={setServices}
-              barbers={barbers}
-              setBarbers={setBarbers}
-              studioInfo={studioInfo}
-              setStudioInfo={setStudioInfo}
-            />
-          )}
-
-          {activeTab === "reviews" && <ReviewsSection />}
-
-          {activeTab === "location" && (
-            <StudioLocation
-              studioInfo={studioInfo}
-              onOpenBooking={() => handleOpenBooking()}
-            />
-          )}
-
-          {activeTab === "seo" && (
-            <SeoSchemaInspector studioInfo={studioInfo} />
-          )}
+        {/* SECTION DIVIDER */}
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+          <div className="flex items-center gap-1 text-[var(--color-brand)]">
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+            <span className="h-2 w-2 rotate-45 border border-[var(--color-brand)]" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
         </div>
+
+        {/* SECTION 4: ATELIER CRAFT STANDARDS GALLERY */}
+        <section id="craft" className="scroll-mt-24 space-y-4">
+          <AtelierCraftGallery
+            onSelectBooking={(serviceId) => handleOpenBooking(serviceId)}
+          />
+        </section>
+
+        {/* SECTION DIVIDER */}
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+          <div className="flex items-center gap-1 text-[var(--color-brand)]">
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+            <span className="h-2 w-2 rotate-45 border border-[var(--color-brand)]" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+        </div>
+
+        {/* SECTION 5: 4-STEP APPOINTMENT BOOKING ENGINE */}
+        <section id="booking" className="scroll-mt-24 space-y-4">
+          <BookingEngine
+            initialServiceId={prefilledServiceId}
+            initialBarberId={prefilledBarberId}
+            services={services}
+          />
+        </section>
+
+        {/* SECTION DIVIDER */}
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+          <div className="flex items-center gap-1 text-[var(--color-brand)]">
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+            <span className="h-2 w-2 rotate-45 border border-[var(--color-brand)]" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+        </div>
+
+        {/* SECTION 6: MASTER BARBER GUILD */}
+        <section id="barbers" className="scroll-mt-24 space-y-4">
+          <BarbersSection
+            barbers={barbers}
+            onSelectBarberForBooking={(barberId) =>
+              handleOpenBooking(undefined, barberId)
+            }
+          />
+        </section>
+
+        {/* SECTION DIVIDER */}
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+          <div className="flex items-center gap-1 text-[var(--color-brand)]">
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+            <span className="h-2 w-2 rotate-45 border border-[var(--color-brand)]" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+        </div>
+
+        {/* SECTION 7: CLIENT TESTIMONIALS & GOOGLE RATINGS */}
+        <section id="reviews" className="scroll-mt-24 space-y-4">
+          <ReviewsSection />
+        </section>
+
+        {/* SECTION DIVIDER */}
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+          <div className="flex items-center gap-1 text-[var(--color-brand)]">
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+            <span className="h-2 w-2 rotate-45 border border-[var(--color-brand)]" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+        </div>
+
+        {/* SECTION 8: STUDIO LOCATION, HOURS & PARKING */}
+        <section id="location" className="scroll-mt-24 space-y-4">
+          <StudioLocation
+            studioInfo={studioInfo}
+            onOpenBooking={() => scrollToSection("booking")}
+          />
+        </section>
+
+        {/* SECTION DIVIDER */}
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+          <div className="flex items-center gap-1 text-[var(--color-brand)]">
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+            <span className="h-2 w-2 rotate-45 border border-[var(--color-brand)]" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+        </div>
+
+        {/* SECTION 9: OWNER NO-CODE CMS STUDIO */}
+        <section id="cms" className="scroll-mt-24 space-y-4">
+          <OwnerCmsStudio
+            services={services}
+            setServices={setServices}
+            barbers={barbers}
+            setBarbers={setBarbers}
+            studioInfo={studioInfo}
+            setStudioInfo={setStudioInfo}
+          />
+        </section>
+
+        {/* SECTION DIVIDER */}
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+          <div className="flex items-center gap-1 text-[var(--color-brand)]">
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+            <span className="h-2 w-2 rotate-45 border border-[var(--color-brand)]" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[var(--color-brand)]" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent w-full max-w-xs" />
+        </div>
+
+        {/* SECTION 10: LOCAL SEO SCHEMA INSPECTOR */}
+        <section id="seo" className="scroll-mt-24 space-y-4">
+          <SeoSchemaInspector studioInfo={studioInfo} />
+        </section>
       </main>
 
       {/* Full-Screen Studio Craft Reel Modal */}
@@ -482,7 +540,7 @@ export default function Home() {
                 setIsReelModalOpen(false);
                 handleOpenBooking();
               }}
-              className="bg-[#b48608] hover:bg-[#966f07] text-white text-xs font-bold uppercase font-mono px-4 py-2"
+              className="bg-[#b48608] hover:bg-[#966f07] text-white text-xs font-bold uppercase font-mono px-4 py-2 cursor-pointer"
             >
               Reserve Chair
             </Button>
